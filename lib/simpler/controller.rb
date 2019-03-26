@@ -2,13 +2,14 @@ require_relative 'view'
 
 module Simpler
   class Controller
-
-    attr_reader :name, :request, :response
+    attr_reader :name, :request, :response, :headers
 
     def initialize(env)
       @name = extract_name
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
+      @headers = @response.headers
+      prepare_params
     end
 
     def make_response(action)
@@ -50,5 +51,12 @@ module Simpler
       @request.env['simpler.template'] = template
     end
 
+    def status(number)
+      @response.status = number
+    end
+
+    def prepare_params
+      @request.env['simpler.params'] = @request.params.merge(@request.env['simpler.route_params'])
+    end
   end
 end
