@@ -29,9 +29,9 @@ module Simpler
     def call(env)
       route = @router.route_for(env)
       return bad_request unless route
+      route.params(env)
       controller = route.controller.new(env)
       action = route.action
-      env['simpler.route_params'] = route.params(env)
       make_response(controller, action)
     end
 

@@ -16,9 +16,9 @@ module Simpler
       end
 
       def params(env)
-        return {} unless @is_parametric
-        
-        set_params(env['PATH_INFO'])
+        return env['simpler.route_params'] = {} unless @is_parametric
+
+        extract_params(env)
       end
 
       private
@@ -40,11 +40,17 @@ module Simpler
         end
       end
 
-      def set_params(path)
-        simpler_params = {}
-        params_key = @path.split(':').last
-        params_value = path.split('/').last
-        simpler_params[params_key.to_sym] = params_value
+      def extract_params(env)
+        env['simpler.route_params'] = {}
+        requested_path = env['PATH_INFO'].split('/')
+        route_path = @path.split('/')
+        route_path.each_with_index do |route_path_part, index|
+          next if route_path_part == requested_path[index]
+
+          key = route_path_part.delete(':').to_sym
+          value = requested_path[index]
+          env['simpler.route_params'] = env['simpler.route_params'].merge({ key => value })
+        end
       end
 
       def parametric?(path)

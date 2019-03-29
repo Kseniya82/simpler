@@ -2,13 +2,12 @@ require_relative 'view'
 
 module Simpler
   class Controller
-    attr_reader :name, :request, :response, :headers
+    attr_reader :name, :request, :response
 
     def initialize(env)
       @name = extract_name
       @request = Rack::Request.new(env)
       @response = Rack::Response.new
-      @headers = @response.headers
       prepare_params
     end
 
@@ -21,6 +20,10 @@ module Simpler
       write_response
 
       @response.finish
+    end
+
+    def headers
+      @response.headers
     end
 
     private
@@ -44,7 +47,7 @@ module Simpler
     end
 
     def params
-      @request.params
+      @request.env['simpler.params']
     end
 
     def render(template)

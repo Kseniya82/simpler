@@ -10,7 +10,8 @@ module Simpler
 
     def render(binding)
       if template.is_a?(Hash)
-        render_plain(template[:plain])
+        type, content = template.first
+        send("render_#{type}", content)
       else
         render_erb(binding)
       end
@@ -45,6 +46,5 @@ module Simpler
 
       Simpler.root.join(VIEW_BASE_PATH, "#{path}.html.erb")
     end
-
   end
 end
