@@ -29,8 +29,10 @@ module Simpler
     def call(env)
       route = @router.route_for(env)
       return bad_request unless route
-      route.params(env)
-      controller = route.controller.new(env)
+      
+      request = Rack::Request.new(env)
+      env['simpler.params'] = request.params.merge(route.params(request))
+      controller = route.controller.new(request)
       action = route.action
       make_response(controller, action)
     end

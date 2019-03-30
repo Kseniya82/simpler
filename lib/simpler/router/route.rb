@@ -15,10 +15,10 @@ module Simpler
         @method == method && path?(path)
       end
 
-      def params(env)
-        return env['simpler.route_params'] = {} unless @is_parametric
+      def params(request)
+        return {} unless @is_parametric
 
-        extract_params(env)
+        extract_params(request.path)
       end
 
       private
@@ -40,16 +40,13 @@ module Simpler
         end
       end
 
-      def extract_params(env)
-        env['simpler.route_params'] = {}
-        requested_path = env['PATH_INFO'].split('/')
+      def extract_params(path)
+        requested_path = path.split('/')
         route_path = @path.split('/')
-        route_path.each_with_index do |route_path_part, index|
-          next if route_path_part == requested_path[index]
-
-          key = route_path_part.delete(':').to_sym
-          value = requested_path[index]
-          env['simpler.route_params'] = env['simpler.route_params'].merge({ key => value })
+        route_path.each.with_index.with_object({}) do |(route_part, index), result|
+          next if route_part == requested_path[index]
+          
+          result[route_part.delete(':').to_sym] = requested_path[index]
         end
       end
 

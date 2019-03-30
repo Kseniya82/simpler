@@ -4,11 +4,10 @@ module Simpler
   class Controller
     attr_reader :name, :request, :response
 
-    def initialize(env)
+    def initialize(request)
       @name = extract_name
-      @request = Rack::Request.new(env)
+      @request = request
       @response = Rack::Response.new
-      prepare_params
     end
 
     def make_response(action)
@@ -39,7 +38,7 @@ module Simpler
     def write_response
       body = render_body
 
-      @response.write(body)
+      @response.write(body + "\n")
     end
 
     def render_body
@@ -56,10 +55,6 @@ module Simpler
 
     def status(number)
       @response.status = number
-    end
-
-    def prepare_params
-      @request.env['simpler.params'] = @request.params.merge(@request.env['simpler.route_params'])
     end
   end
 end

@@ -11,7 +11,7 @@ module Simpler
     def render(binding)
       if template.is_a?(Hash)
         type, content = template.first
-        send("render_#{type}", content)
+        send("render_#{type}", content, binding)
       else
         render_erb(binding)
       end
@@ -25,8 +25,8 @@ module Simpler
       ERB.new(template).result(binding)
     end
 
-    def render_plain(text)
-      text + "\n"
+    def render_plain(text, _binding)
+      text
     end
 
     def controller
